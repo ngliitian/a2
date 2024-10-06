@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Fast Food Consumption and Obesity</title>
+  <!-- Link to external CSS file -->
+  <link rel="stylesheet" href="styles.css">
+  <!-- Include Vega, Vega-Lite, and Vega-Embed libraries -->
+  <script src="https://cdn.jsdelivr.net/npm/vega@5"></script>
+  <script src="https://cdn.jsdelivr.net/npm/vega-lite@5"></script>
+  <script src="https://cdn.jsdelivr.net/npm/vega-embed@6"></script>
+</head>
+<body>
+  <h1>Fast Food Consumption and Obesity Dashboard</h1>
+
+  <!-- Choropleth Map 1 -->
+  <h2>Obesity Rate by State</h2>
+  <div id="obesity-map"></div>
+
+  <!-- Choropleth Map 2 -->
+  <h2>Fast Food Retails</h2>
+  <div id="consumption-map"></div>
+
+  <!-- Bar Chart -->
+  <h2>Top Fast Food Retail Chains</h2>
+  <div id="bar-chart"></div>
+
+  <script type="text/javascript">
+    // Obesity Rate 
+    var obesityMapSpec = {
+"$schema": "https://vega.github.io/schema/vega-lite/v5.json",
+"title": "Obesity rate in 2023",
+"width": 800,
+"height": 400,
+"projection": {"type": "equirectangular"},
+"data": {
+"url": "https://raw.githubusercontent.com/ngliitian/1234/refs/heads/main/STE_2021_AUST_GDA2020.json",
+"format": {"type": "topojson", "feature": "STE_2021_AUST_GDA2020"}
+},
+"transform": [
+{
+"lookup": "properties.STE_NAME21",
+"from": {
+"data": {
+"url": "https://raw.githubusercontent.com/ngliitian/1234/refs/heads/main/obesity_rate.csv"
+},
+"key": "State",
+"fields": ["obesity_rate"]
+}
+}
+],
+"mark": {"type": "geoshape"},
+"encoding": {
+"color": {
+"field": "obesity_rate",
+"type": "quantitative"
+},
+"tooltip": [
+{"field": "properties.STE_NAME21", "type": "nominal", "title":
+"State"},
+{"field": "obesity_rate", "type": "quantitative"}
+]
+}
+};
+
+    // number of fast food retails 
+    var consumptionMapSpec = {
+  "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
+  "title": "Number of Fast Food Retails",
+  "width": 800,
+  "height": 400,
+  "projection": {"type": "equirectangular"},
+  "data": {
+    "url": "https://raw.githubusercontent.com/ngliitian/1234/refs/heads/main/STE_2021_AUST_GDA2020.json",
+    "format": {"type": "topojson", "feature": "STE_2021_AUST_GDA2020"}
+  },
+  "transform": [
+    {
+      "lookup": "properties.STE_NAME21",
+      "from": {
+        "data": {
+          "url": "https://raw.githubusercontent.com/ngliitian/1234/refs/heads/main/retails.csv"
+        },
+        "key": "state",
+        "fields": ["retails"]
+      }
+    },
+    {
+      "calculate": "'There are ' + datum.retails + ' retail shops in ' + datum.properties.STE_NAME21 + '.'",
+      "as": ":"
+    }
+  ],
+  "mark": {"type": "geoshape"},
+  "encoding": {
+    "color": {
+      "field": "retails",
+      "type": "quantitative",
+      "title": "Number of Retail Shops"
+    },
+    "tooltip": [
+      {"field": ":", "type": "nominal"}
+    ]
+  }
+}
+;
+    //  Bar Chart
+    var barChartSpec = {
+  "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
+  "title": "Top Fast Food Retail Chains",
+  "width": 800,
+  "height": 400,
+  "data": {
+    "url": "https://raw.githubusercontent.com/ngliitian/1234/refs/heads/main/top.csv"
+  },
+  "mark": "bar",
+  "encoding": {
+    "x": {
+      "field": "total",
+      "type": "quantitative",
+      "title": "Number of Locations",
+      "axis": {"grid": false}
+    },
+    "y": {
+      "field": "retails",
+      "type": "nominal",
+      "sort": "-x",  
+      "title": "retails",
+    },
+    "tooltip": [
+      {"field": "retails", "type": "nominal", "title": "Fast Food Chain"},
+      {"field": "total", "type": "quantitative", "title": "Number of Locations"}
+    ]
+  }
+};
+
+    // Embed the Obesity Map
+    vegaEmbed('#obesity-map', obesityMapSpec).then(function(result) {
+      console.log(result);
+    }).catch(console.error);
+
+    // Embed the Consumption Map
+    vegaEmbed('#consumption-map', consumptionMapSpec).then(function(result) {
+      console.log(result);
+    }).catch(console.error);
+
+    // Embed the Bar Chart
+    vegaEmbed('#bar-chart', barChartSpec).then(function(result) {
+      console.log(result);
+    }).catch(console.error);
+  </script>
+</body>
+</html>
